@@ -15,7 +15,7 @@ public class UIIntSlider : MonoBehaviour
 	{
 		if (data != null)
 		{
-			label.text = data.name;
+			label.text = data.title;
 			name = data.name;
 		}
 	}

@@ -6,6 +6,8 @@ using UnityEngine.Events;
 
 public class Board : MonoBehaviour
 {
+	[SerializeField] IntData playerCount;
+
 	private const int SIZE = 19;
 
 	public GameObject btnPrefab;
@@ -13,7 +15,6 @@ public class Board : MonoBehaviour
 	public Sprite[] playerPieces;
 
 	private int[,] board = new int[SIZE, SIZE];
-	private int playerCount = 2;
 	private int currentPlayer = 1;
 
 	private void Start()
@@ -54,7 +55,7 @@ public class Board : MonoBehaviour
 			Capture(x, y);
 			CheckWin(x, y);
 
-			if (++currentPlayer > playerCount) { currentPlayer = 1; }
+			if (++currentPlayer > playerCount.value) { currentPlayer = 1; }
 		}
 	}
 
