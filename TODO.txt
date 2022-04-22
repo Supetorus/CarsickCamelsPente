@@ -1,16 +1,16 @@
 [ ] Make Pente
 [ ] Straightforward GUI
-[ ] 19 x 19
+[x] 19 x 19
 [ ] Announces Tria
 [ ] Announces Tessera
 [ ] Count captured pieces
 [ ] Can enter names (has defaults)
 [ ] Winner is announced (for the seratonin)
-[ ] Can start new game after game
+[x] Can start new game after game
 [ ] Visible turn timer (30 seconds)
 
 
 Stretch goals
 [ ] Players can pick their colors.
-[ ] Can have more than 2 players.
+[x] Can have more than 2 players.
 [ ] Can save and reload games.
