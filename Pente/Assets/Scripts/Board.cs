@@ -28,19 +28,19 @@ public class Board : MonoBehaviour
 
 	private void Start()
 	{
-<<<<<<< Updated upstream
+
 
         for (int i = 1; i <= 4; i++)
         {
 			GameObject newPlayer = GameObject.Find("P1Name");
 			string playerName = newPlayer.GetComponent<TMP_InputField>().text;
+			
 
 			// Sprite chosen = add 
         }
 
-=======
-		SetColors();
->>>>>>> Stashed changes
+
+	
 
 		GetComponent<GridLayoutGroup>().cellSize = Vector2.one * (900.0f / SIZE);
 
@@ -77,6 +77,7 @@ public class Board : MonoBehaviour
 	public void ResetGame()
 	{
 		currentPlayer = 1;
+		turnTimer = 30.0f;
 
 		for (int y = 0; y < SIZE; ++y)
 		{
@@ -85,14 +86,6 @@ public class Board : MonoBehaviour
 				board[x, y] = 0;
 				transform.GetChild(y * SIZE + x).GetComponent<Image>().sprite = btnBackground;
 			}
-		}
-	}
-
-	public void SetColors()
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			playerPieces[i] = availablePieces[colors[i].value];
 		}
 	}
 
