@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using TMPro;
 
 public class Board : MonoBehaviour
 {
@@ -20,8 +21,21 @@ public class Board : MonoBehaviour
 	private int[,] board = new int[SIZE, SIZE];
 	private int currentPlayer = 1;
 
+	private List<Player> players; 
+
+
 	private void Start()
 	{
+
+        for (int i = 1; i <= 4; i++)
+        {
+			GameObject newPlayer = GameObject.Find("P1Name");
+			string playerName = newPlayer.GetComponent<TMP_InputField>().text;
+
+			// Sprite chosen = add 
+        }
+
+
 		GetComponent<GridLayoutGroup>().cellSize = Vector2.one * (900.0f / SIZE);
 
 		gameStart = true;
