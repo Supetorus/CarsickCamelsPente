@@ -14,12 +14,17 @@ public class Board : MonoBehaviour
 	public Sprite btnBackground;
 	public Sprite[] playerPieces;
 
+	private float turnTimer = 30.0f;
+	private bool gameStart = false;
+
 	private int[,] board = new int[SIZE, SIZE];
 	private int currentPlayer = 1;
 
 	private void Start()
 	{
 		GetComponent<GridLayoutGroup>().cellSize = Vector2.one * (900.0f / SIZE);
+
+		gameStart = true;
 
 		for (int y = 0; y < SIZE; ++y)
 		{
@@ -31,7 +36,25 @@ public class Board : MonoBehaviour
 		}
 	}
 
-	public void ResetGame()
+    private void Update()
+    {
+		print(gameStart);
+		print(turnTimer);
+
+		if (gameStart)
+		{
+			turnTimer -= Time.deltaTime;
+
+			if (turnTimer < 0)
+			{
+				if (++currentPlayer > playerCount.value) { currentPlayer = 1; }
+				turnTimer = 30.0f;
+			}
+		}
+
+    }
+
+    public void ResetGame()
 	{
 		currentPlayer = 1;
 
@@ -45,6 +68,8 @@ public class Board : MonoBehaviour
 		}
 	}
 
+	
+
 	public void ClickCell(int x, int y)
 	{
 		if (board[x, y] == 0)
@@ -56,6 +81,7 @@ public class Board : MonoBehaviour
 			CheckWin(x, y);
 
 			if (++currentPlayer > playerCount.value) { currentPlayer = 1; }
+			turnTimer = 30.0f;
 		}
 	}
 
