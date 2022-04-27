@@ -14,6 +14,8 @@ public class Board : MonoBehaviour
 	public GameObject btnPrefab;
 	public Sprite btnBackground;
 	public Sprite[] playerPieces;
+	public EnumData[] colors;
+	public Sprite[] availablePieces;
 
 	private float turnTimer = 30.0f;
 	private bool gameStart = false;
@@ -26,6 +28,7 @@ public class Board : MonoBehaviour
 
 	private void Start()
 	{
+<<<<<<< Updated upstream
 
         for (int i = 1; i <= 4; i++)
         {
@@ -35,6 +38,9 @@ public class Board : MonoBehaviour
 			// Sprite chosen = add 
         }
 
+=======
+		SetColors();
+>>>>>>> Stashed changes
 
 		GetComponent<GridLayoutGroup>().cellSize = Vector2.one * (900.0f / SIZE);
 
@@ -50,8 +56,8 @@ public class Board : MonoBehaviour
 		}
 	}
 
-    private void Update()
-    {
+	private void Update()
+	{
 		print(gameStart);
 		print(turnTimer);
 
@@ -66,9 +72,9 @@ public class Board : MonoBehaviour
 			}
 		}
 
-    }
+	}
 
-    public void ResetGame()
+	public void ResetGame()
 	{
 		currentPlayer = 1;
 
@@ -82,7 +88,13 @@ public class Board : MonoBehaviour
 		}
 	}
 
-	
+	public void SetColors()
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			playerPieces[i] = availablePieces[colors[i].value];
+		}
+	}
 
 	public void ClickCell(int x, int y)
 	{
@@ -104,11 +116,11 @@ public class Board : MonoBehaviour
 		bool[] flags = { true, true, true, true, true, true, true, true };
 		int highest = 0;
 
-		for(int i = 1; i < 5; ++i)
+		for (int i = 1; i < 5; ++i)
 		{
 			if (x - i >= 0)
 			{
-				if(flags[0] && board[x - i, y] == currentPlayer) { highest = i; }
+				if (flags[0] && board[x - i, y] == currentPlayer) { highest = i; }
 				else { flags[0] = false; }
 
 				if (flags[1] && y - i >= 0 && board[x - i, y - i] == currentPlayer) { highest = i; }
@@ -130,16 +142,16 @@ public class Board : MonoBehaviour
 				else { flags[5] = false; }
 			}
 
-			if(flags[6] && y - i >= 0 && board[x, y - i] == currentPlayer) { highest = i; }
+			if (flags[6] && y - i >= 0 && board[x, y - i] == currentPlayer) { highest = i; }
 			else { flags[6] = false; }
 
 			if (flags[7] && y + i >= 0 && board[x, y + i] == currentPlayer) { highest = i; }
 			else { flags[7] = false; }
 		}
 
-		if(highest == 2) { print("Three"); }
-		if(highest == 3) { print("Four"); }
-		if(highest == 4) { print("YOU WIN!!11!!1"); }
+		if (highest == 2) { print("Three"); }
+		if (highest == 3) { print("Four"); }
+		if (highest == 4) { print("YOU WIN!!11!!1"); }
 	}
 
 	private void Capture(int x, int y)
