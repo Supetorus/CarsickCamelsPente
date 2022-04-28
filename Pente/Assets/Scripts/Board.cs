@@ -7,44 +7,47 @@ using TMPro;
 
 public class Board : MonoBehaviour
 {
-	[SerializeField] IntData playerCount;
-
 	private const int SIZE = 19;
+	private Vector2Int[] directions = {
+		Vector2Int.up,
+		Vector2Int.down,
+		Vector2Int.left,
+		Vector2Int.right,
+		Vector2Int.up + Vector2Int.left,
+		Vector2Int.up + Vector2Int.right,
+		Vector2Int.down + Vector2Int.left,
+		Vector2Int.down + Vector2Int.right,
+	};
 
 	public GameObject btnPrefab;
 	public Sprite btnBackground;
-	public Sprite[] playerPieces;
-	public EnumData[] colors;
+	public IntData playerCount;
+	public StringData[] playerNames;
+	public EnumData[] playerColors;
 	public Sprite[] availablePieces;
 
 	private float turnTimer = 30.0f;
 	private bool gameStart = false;
 
 	private int[,] board = new int[SIZE, SIZE];
-	private int currentPlayer = 1;
+	private int currentPlayer = 0;
 
-	private List<Player> players; 
-
+	private List<Player> players = new List<Player>();
+	private List<Player> currentPlayers;
 
 	private void Start()
 	{
 
+	}
 
-        for (int i = 1; i <= 4; i++)
-        {
-			GameObject newPlayer = GameObject.Find("P1Name");
-			string playerName = newPlayer.GetComponent<TMP_InputField>().text;
-			
-
-			// Sprite chosen = add 
-        }
-
-
-	
+	public void SetupGame()
+	{
+		for (int i = 0; i < playerCount.value; ++i)
+		{
+			players.Add(new Player(availablePieces[playerColors[i].value], playerNames[i].value, i));
+		}
 
 		GetComponent<GridLayoutGroup>().cellSize = Vector2.one * (900.0f / SIZE);
-
-		gameStart = true;
 
 		for (int y = 0; y < SIZE; ++y)
 		{
@@ -54,13 +57,12 @@ public class Board : MonoBehaviour
 				Instantiate(btnPrefab, transform).GetComponent<Button>().onClick.AddListener(new UnityAction(() => ClickCell(tempX, tempY)));
 			}
 		}
+
+		ResetGame();
 	}
 
 	private void Update()
 	{
-		print(gameStart);
-		print(turnTimer);
-
 		if (gameStart)
 		{
 			turnTimer -= Time.deltaTime;
@@ -71,19 +73,21 @@ public class Board : MonoBehaviour
 				turnTimer = 30.0f;
 			}
 		}
-
 	}
 
 	public void ResetGame()
 	{
-		currentPlayer = 1;
+		Debug.ClearDeveloperConsole();
+		currentPlayers = players;
+		currentPlayer = 0;
 		turnTimer = 30.0f;
+		gameStart = true;
 
 		for (int y = 0; y < SIZE; ++y)
 		{
 			for (int x = 0; x < SIZE; ++x)
 			{
-				board[x, y] = 0;
+				board[x, y] = -1;
 				transform.GetChild(y * SIZE + x).GetComponent<Image>().sprite = btnBackground;
 			}
 		}
@@ -91,15 +95,17 @@ public class Board : MonoBehaviour
 
 	public void ClickCell(int x, int y)
 	{
-		if (board[x, y] == 0)
+		if (board[x, y] == -1)
 		{
-			board[x, y] = currentPlayer;
-			transform.GetChild(y * SIZE + x).GetComponent<Image>().sprite = playerPieces[currentPlayer - 1];
+			board[x, y] = currentPlayers[currentPlayer].number;
+			transform.GetChild(y * SIZE + x).GetComponent<Image>().sprite = currentPlayers[currentPlayer].sprite;
 
 			Capture(x, y);
 			CheckWin(x, y);
 
-			if (++currentPlayer > playerCount.value) { currentPlayer = 1; }
+			++currentPlayer;
+			currentPlayer %= currentPlayers.Count;
+
 			turnTimer = 30.0f;
 		}
 	}
@@ -109,6 +115,7 @@ public class Board : MonoBehaviour
 		bool[] flags = { true, true, true, true, true, true, true, true };
 		int highest = 0;
 
+		//TODO: refactor
 		for (int i = 1; i < 5; ++i)
 		{
 			if (x - i >= 0)
@@ -138,86 +145,50 @@ public class Board : MonoBehaviour
 			if (flags[6] && y - i >= 0 && board[x, y - i] == currentPlayer) { highest = i; }
 			else { flags[6] = false; }
 
-			if (flags[7] && y + i >= 0 && board[x, y + i] == currentPlayer) { highest = i; }
+			if (flags[7] && y + i < SIZE && board[x, y + i] == currentPlayer) { highest = i; }
 			else { flags[7] = false; }
 		}
 
 		if (highest == 2) { print("Three"); }
 		if (highest == 3) { print("Four"); }
-		if (highest == 4) { print("YOU WIN!!11!!1"); }
+		if (highest == 4) { Win(currentPlayer); }
 	}
 
 	private void Capture(int x, int y)
 	{
-		//I will hopefully refactor this garbage code
-		if (x > 2)
+		foreach (Vector2Int v in directions)
 		{
-			if (board[x - 1, y] == board[x - 2, y] && board[x - 1, y] != board[x - 3, y] && board[x - 3, y] > 0)
+			if (Captureable(x + v.x * 3, y + v.y * 3) &&
+				board[x + v.x, y + v.y] != -1 &&
+				board[x + v.x * 3, y + v.y * 3] != -1 &&
+				board[x + v.x, y + v.y] != board[x + v.x * 3, y + v.y * 3] &&
+				board[x, y] != board[x + v.x, y + v.y] &&
+				board[x + v.x, y + v.y] == board[x + v.x * 2, y + v.y * 2])
 			{
-				board[x - 1, y] = 0;
-				transform.GetChild(y * SIZE + x - 1).GetComponent<Image>().sprite = btnBackground;
-				board[x - 2, y] = 0;
-				transform.GetChild(y * SIZE + x - 2).GetComponent<Image>().sprite = btnBackground;
-			}
+				if (++players[board[x + v.x, y + v.y]].captured == 5)
+				{
+					currentPlayers.Remove(players[board[x + v.x, y + v.y]]);
+					++currentPlayer;
+					currentPlayer %= currentPlayers.Count;
+					if(currentPlayers.Count == 1) { Win(0); }
+					print("Player " + (board[x + v.x, y + v.y] + 1) + " is out!");
+				}
 
-			if (y > 2 && board[x - 1, y - 1] == board[x - 2, y - 2] && board[x - 1, y - 1] != board[x - 3, y - 3] && board[x - 3, y - 3] > 0)
-			{
-				board[x - 1, y - 1] = 0;
-				transform.GetChild((y - 1) * SIZE + x - 1).GetComponent<Image>().sprite = btnBackground;
-				board[x - 2, y - 2] = 0;
-				transform.GetChild((y - 2) * SIZE + x - 2).GetComponent<Image>().sprite = btnBackground;
-			}
-
-			if (y < SIZE - 3 && board[x - 1, y + 1] == board[x - 2, y + 2] && board[x - 1, y + 1] != board[x - 3, y + 3] && board[x - 3, y + 3] > 0)
-			{
-				board[x - 1, y + 1] = 0;
-				transform.GetChild((y + 1) * SIZE + x - 1).GetComponent<Image>().sprite = btnBackground;
-				board[x - 2, y + 2] = 0;
-				transform.GetChild((y + 2) * SIZE + x - 2).GetComponent<Image>().sprite = btnBackground;
+				board[x + v.x, y + v.y] = -1;
+				transform.GetChild((y + v.y) * SIZE + x + v.x).GetComponent<Image>().sprite = btnBackground;
+				board[x + v.x * 2, y + v.y * 2] = -1;
+				transform.GetChild((y + v.y * 2) * SIZE + x + v.x * 2).GetComponent<Image>().sprite = btnBackground;
 			}
 		}
+	}
 
-		if (x < SIZE - 3)
-		{
-			if (board[x + 1, y] == board[x + 2, y] && board[x + 1, y] != board[x + 3, y] && board[x + 3, y] > 0)
-			{
-				board[x + 1, y] = 0;
-				transform.GetChild(y * SIZE + x + 1).GetComponent<Image>().sprite = btnBackground;
-				board[x + 2, y] = 0;
-				transform.GetChild(y * SIZE + x + 2).GetComponent<Image>().sprite = btnBackground;
-			}
+	private bool Captureable(int x, int y)
+	{
+		return x >= 0 && x < SIZE && y >= 0 && y < SIZE;
+	}
 
-			if (y > 2 && board[x + 1, y - 1] == board[x + 2, y - 2] && board[x + 1, y - 1] != board[x + 3, y - 3] && board[x + 3, y - 3] > 0)
-			{
-				board[x + 1, y - 1] = 0;
-				transform.GetChild((y - 1) * SIZE + x + 1).GetComponent<Image>().sprite = btnBackground;
-				board[x + 2, y - 2] = 0;
-				transform.GetChild((y - 2) * SIZE + x + 2).GetComponent<Image>().sprite = btnBackground;
-			}
-
-			if (y < SIZE - 3 && board[x + 1, y + 1] == board[x + 2, y + 2] && board[x + 1, y + 1] != board[x + 3, y + 3] && board[x + 3, y + 3] > 0)
-			{
-				board[x + 1, y + 1] = 0;
-				transform.GetChild((y + 1) * SIZE + x + 1).GetComponent<Image>().sprite = btnBackground;
-				board[x + 2, y + 2] = 0;
-				transform.GetChild((y + 2) * SIZE + x + 2).GetComponent<Image>().sprite = btnBackground;
-			}
-		}
-
-		if (y > 2 && board[x, y - 1] == board[x, y - 2] && board[x, y - 1] != board[x, y - 3] && board[x, y - 3] > 0)
-		{
-			board[x, y - 1] = 0;
-			transform.GetChild((y - 1) * SIZE + x).GetComponent<Image>().sprite = btnBackground;
-			board[x, y - 2] = 0;
-			transform.GetChild((y - 2) * SIZE + x).GetComponent<Image>().sprite = btnBackground;
-		}
-
-		if (y < SIZE - 3 && board[x, y + 1] == board[x, y + 2] && board[x, y + 1] != board[x, y + 3] && board[x, y + 3] > 0)
-		{
-			board[x, y + 1] = 0;
-			transform.GetChild((y + 1) * SIZE + x).GetComponent<Image>().sprite = btnBackground;
-			board[x, y + 2] = 0;
-			transform.GetChild((y + 2) * SIZE + x).GetComponent<Image>().sprite = btnBackground;
-		}
+	private void Win(int player)
+	{
+		print(currentPlayers[player].name + " Wins!");
 	}
 }

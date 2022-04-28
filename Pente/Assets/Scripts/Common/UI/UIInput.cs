@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class UIText : MonoBehaviour
+public class UIInput : MonoBehaviour
 {
 	[SerializeField] TMP_Text label;
 	[SerializeField] TMP_Text text;
@@ -21,6 +21,6 @@ public class UIText : MonoBehaviour
 
 	private void Update()
 	{
-		text.text = data.value;
+		data.value = text.text;
 	}
 }

@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _value: 0
   values:
-  - White
   - Black
   - Blue
-  - Red
   - Green
-  - Yellow
   - Pink
   - Purple
+  - Red
+  - White
+  - Yellow
