@@ -29,6 +29,7 @@ public class Board : MonoBehaviour
 
 	public StringData timeString;
 	public StringData playerString;
+	public UIAnnouncement announcement;
 
 	private float turnTimer = 30.0f;
 	private bool gameStart = false;
@@ -163,8 +164,8 @@ public class Board : MonoBehaviour
 			else { flags[7] = false; }
 		}
 
-		if (highest == 2) { print("Three"); }
-		if (highest == 3) { print("Four"); }
+		if (highest == 2) { announcement.Display("Three"); }
+		if (highest == 3) { announcement.Display("Four"); }
 		if (highest == 4) { Win(currentPlayer); }
 	}
 
@@ -181,7 +182,7 @@ public class Board : MonoBehaviour
 			{
 				if (++players[board[x + v.x, y + v.y]].captured == 5)
 				{
-					print("Player " + players[board[x + v.x, y + v.y]].name + " is out!");
+					announcement.Display("Player " + players[board[x + v.x, y + v.y]].name + " is out!");
 					currentPlayers.Remove(players[board[x + v.x, y + v.y]]);
 					++currentPlayer;
 					currentPlayer %= currentPlayers.Count;
@@ -205,6 +206,6 @@ public class Board : MonoBehaviour
 	private void Win(int player)
 	{
 		gameOver = true;
-		print(currentPlayers[player].name + " Wins!");
+		announcement.Display(currentPlayers[player].name + " Wins!");
 	}
 }
