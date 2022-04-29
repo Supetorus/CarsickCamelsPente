@@ -30,6 +30,7 @@ public class Board : MonoBehaviour
 
 	private float turnTimer = 30.0f;
 	private bool gameStart = false;
+	private bool gameOver = false;
 
 	private int[,] board = new int[SIZE, SIZE];
 	private int currentPlayer = 0;
@@ -92,6 +93,7 @@ public class Board : MonoBehaviour
 		currentPlayer = 0;
 		turnTimer = 30.0f;
 		gameStart = true;
+		gameOver = false;
 
 		for (int y = 0; y < SIZE; ++y)
 		{
@@ -105,7 +107,7 @@ public class Board : MonoBehaviour
 
 	public void ClickCell(int x, int y)
 	{
-		if (board[x, y] == -1)
+		if (board[x, y] == -1 && !gameOver)
 		{
 			board[x, y] = currentPlayers[currentPlayer].number;
 			transform.GetChild(y * SIZE + x).GetComponent<Image>().sprite = currentPlayers[currentPlayer].sprite;
@@ -199,6 +201,7 @@ public class Board : MonoBehaviour
 
 	private void Win(int player)
 	{
+		gameOver = true;
 		print(currentPlayers[player].name + " Wins!");
 	}
 }
