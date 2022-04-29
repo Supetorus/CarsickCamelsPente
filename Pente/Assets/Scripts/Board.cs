@@ -26,6 +26,8 @@ public class Board : MonoBehaviour
 	public EnumData[] playerColors;
 	public Sprite[] availablePieces;
 
+	public StringData timeString;
+
 	private float turnTimer = 30.0f;
 	private bool gameStart = false;
 
@@ -66,11 +68,19 @@ public class Board : MonoBehaviour
 		if (gameStart)
 		{
 			turnTimer -= Time.deltaTime;
+			timeString.value = turnTimer.ToString("F1"); 
+			//print(timeString.value);
+		
+			
+
 
 			if (turnTimer < 0)
 			{
 				if (++currentPlayer > playerCount.value) { currentPlayer = 1; }
 				turnTimer = 30.0f;
+
+		
+
 			}
 		}
 	}
