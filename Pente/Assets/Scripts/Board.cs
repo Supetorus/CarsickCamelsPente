@@ -87,7 +87,7 @@ public class Board : MonoBehaviour
 	public void ResetGame()
 	{
 		Debug.ClearDeveloperConsole();
-		currentPlayers = players;
+		currentPlayers = new List<Player>(players);
 		currentPlayer = 0;
 		turnTimer = 30.0f;
 		gameStart = true;
@@ -128,45 +128,45 @@ public class Board : MonoBehaviour
 	private void CheckWin(int x, int y)
 	{
 		bool[] flags = { true, true, true, true, true, true, true, true };
+		int[] lengths = { 0, 0, 0, 0 };
 		int highest = 0;
 
-		//TODO: refactor
 		for (int i = 1; i < 5; ++i)
 		{
 			if (x - i >= 0)
 			{
-				if (flags[0] && board[x - i, y] == currentPlayer) { highest = i; }
+				if (flags[0] && board[x - i, y] == currentPlayer) { highest = Mathf.Max(++lengths[0], highest); }
 				else { flags[0] = false; }
 
-				if (flags[1] && y - i >= 0 && board[x - i, y - i] == currentPlayer) { highest = i; }
+				if (flags[1] && y - i >= 0 && board[x - i, y - i] == currentPlayer) { highest = Mathf.Max(++lengths[2], highest); }
 				else { flags[1] = false; }
 
-				if (flags[2] && y + i < SIZE && board[x - i, y + i] == currentPlayer) { highest = i; }
+				if (flags[2] && y + i < SIZE && board[x - i, y + i] == currentPlayer) { highest = Mathf.Max(++lengths[3], highest); }
 				else { flags[2] = false; }
 			}
 
 			if (x + i < SIZE)
 			{
-				if (flags[3] && board[x + i, y] == currentPlayer) { highest = i; }
+				if (flags[3] && board[x + i, y] == currentPlayer) { highest = Mathf.Max(++lengths[0], highest); }
 				else { flags[3] = false; }
 
-				if (flags[4] && y - i >= 0 && board[x + i, y - i] == currentPlayer) { highest = i; }
+				if (flags[4] && y - i >= 0 && board[x + i, y - i] == currentPlayer) { highest = Mathf.Max(++lengths[3], highest); }
 				else { flags[4] = false; }
 
-				if (flags[5] && y + i < SIZE && board[x + i, y + i] == currentPlayer) { highest = i; }
+				if (flags[5] && y + i < SIZE && board[x + i, y + i] == currentPlayer) { highest = Mathf.Max(++lengths[2], highest); }
 				else { flags[5] = false; }
 			}
 
-			if (flags[6] && y - i >= 0 && board[x, y - i] == currentPlayer) { highest = i; }
+			if (flags[6] && y - i >= 0 && board[x, y - i] == currentPlayer) { highest = Mathf.Max(++lengths[1], highest); }
 			else { flags[6] = false; }
 
-			if (flags[7] && y + i < SIZE && board[x, y + i] == currentPlayer) { highest = i; }
+			if (flags[7] && y + i < SIZE && board[x, y + i] == currentPlayer) { highest = Mathf.Max(++lengths[1], highest); }
 			else { flags[7] = false; }
 		}
 
 		if (highest == 2) { announcement.Display("Three"); }
 		if (highest == 3) { announcement.Display("Four"); }
-		if (highest == 4) { Win(currentPlayer); }
+		if (highest > 3) { Win(currentPlayer); }
 	}
 
 	private void Capture(int x, int y)
@@ -186,7 +186,7 @@ public class Board : MonoBehaviour
 					currentPlayers.Remove(players[board[x + v.x, y + v.y]]);
 					++currentPlayer;
 					currentPlayer %= currentPlayers.Count;
-					if(currentPlayers.Count == 1) { Win(0); }
+					if (currentPlayers.Count == 1) { Win(0); }
 				}
 				playerCaptures[board[x + v.x, y + v.y]].value += 2;
 
