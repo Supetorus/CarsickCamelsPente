@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,7 +23,7 @@ public class UITextAndNumber : MonoBehaviour
     private void Update()
     {
         label.text = strData.value;
-        if (strData.value.Equals(""))
+        if (label.text.Equals("​"))
         {
             text.text = "";
         }
@@ -31,5 +31,6 @@ public class UITextAndNumber : MonoBehaviour
         {
             text.text = intData.value.ToString();
         }
+        //text.text = intData.value.ToString();
     }
 }

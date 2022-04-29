@@ -80,11 +80,6 @@ public class Board : MonoBehaviour
 				if (++currentPlayer > playerCount.value) { currentPlayer = 1; }
 				turnTimer = 30.0f;
 			}
-
-            foreach (var cap in playerCaptures)
-            {
-				cap.value = 0;
-            }
 		}
 	}
 
@@ -96,6 +91,11 @@ public class Board : MonoBehaviour
 		turnTimer = 30.0f;
 		gameStart = true;
 		gameOver = false;
+
+		foreach (var cap in playerCaptures)
+		{
+			cap.value = 0;
+		}
 
 		for (int y = 0; y < SIZE; ++y)
 		{
