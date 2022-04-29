@@ -24,9 +24,11 @@ public class Board : MonoBehaviour
 	public IntData playerCount;
 	public StringData[] playerNames;
 	public EnumData[] playerColors;
+	public IntData[] playerCaptures;
 	public Sprite[] availablePieces;
 
 	public StringData timeString;
+	public StringData playerString;
 
 	private float turnTimer = 30.0f;
 	private bool gameStart = false;
@@ -66,23 +68,23 @@ public class Board : MonoBehaviour
 
 	private void Update()
 	{
-		if (gameStart)
+		if (gameStart && !gameOver)
 		{
 			turnTimer -= Time.deltaTime;
-			timeString.value = turnTimer.ToString("F1"); 
+			timeString.value = turnTimer.ToString("F1");
+			playerString.value = currentPlayers[currentPlayer].name;
 			//print(timeString.value);
-		
-			
-
 
 			if (turnTimer < 0)
 			{
 				if (++currentPlayer > playerCount.value) { currentPlayer = 1; }
 				turnTimer = 30.0f;
-
-		
-
 			}
+
+            foreach (var cap in playerCaptures)
+            {
+				cap.value = 0;
+            }
 		}
 	}
 
@@ -179,12 +181,13 @@ public class Board : MonoBehaviour
 			{
 				if (++players[board[x + v.x, y + v.y]].captured == 5)
 				{
+					print("Player " + players[board[x + v.x, y + v.y]].name + " is out!");
 					currentPlayers.Remove(players[board[x + v.x, y + v.y]]);
 					++currentPlayer;
 					currentPlayer %= currentPlayers.Count;
 					if(currentPlayers.Count == 1) { Win(0); }
-					print("Player " + (board[x + v.x, y + v.y] + 1) + " is out!");
 				}
+				playerCaptures[board[x + v.x, y + v.y]].value += 2;
 
 				board[x + v.x, y + v.y] = -1;
 				transform.GetChild((y + v.y) * SIZE + x + v.x).GetComponent<Image>().sprite = btnBackground;
